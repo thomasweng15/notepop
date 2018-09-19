@@ -1,5 +1,19 @@
 from tkinter import *
 
+class noteGui:
+    def __init__(self):
+        self.root = Tk()
+        self.scrollTextArea = scrollTxtArea(self.root)
+        self.root.title('Append Note')
+        self.root.bind('<Return>', self.close)
+
+    def close(self, evt):
+        print("hello")
+        self.root.destroy()
+    
+    def run(self):
+        self.root.mainloop()
+
 class scrollTxtArea:
     def __init__(self,root):
         frame=Frame(root)
@@ -22,9 +36,5 @@ class scrollTxtArea:
         textPad.pack(side=TOP)
         return
 
-def main():
-    root = Tk()
-    foo =scrollTxtArea(root)
-    root.title('Append Note')
-    root.mainloop()
-main()
+ng = noteGui()
+ng.run()
