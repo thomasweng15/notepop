@@ -8,12 +8,11 @@ class noteGui:
         self.root = tk.Tk()
         self.scrollTxtArea = scrollTxtArea(self.root)
         self.root.title('Append Note')
+        self.root.bind('<Return>', self.close)
+        self.root.bind("<FocusIn>", self.handle_focus)
 
         if platform() == 'Darwin':  # How Mac OS X is identified by Python
             system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "python" to true' ''')
-
-        self.root.bind('<Return>', self.close)
-        self.root.bind("<FocusIn>", self.handle_focus)
 
     def handle_focus(self, evt):
         if evt.widget == self.root:
@@ -22,9 +21,9 @@ class noteGui:
 
     def close(self, evt=None):
         text = self.scrollTxtArea.getText()
+        self.root.destroy()
         with open(self.fname, "a") as f:
             f.write(text)
-        self.root.destroy()
     
     def run(self):
         self.root.lift()
@@ -57,11 +56,13 @@ class scrollTxtArea:
         return
 
     def getText(self):
-        return '* ' + self.text.get("1.0", tk.END).strip() + '\n'
+        text = self.text.get("1.0", tk.END).strip() 
+        if text != "":
+            return '* ' + text + '\n'
 
     def setFocus(self):
         self.text.focus_set()
 
 if __name__ == '__main__':
-    ng = noteGui("notes.md")
+    ng = noteGui("/Users/thomas/Dropbox/PhD/notes.md")
     ng.run()
