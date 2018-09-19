@@ -8,6 +8,7 @@ class noteGui:
         self.root = tk.Tk()
         self.scrollTxtArea = scrollTxtArea(self.root)
         self.root.title('Append Note')
+        self.root.bind('<Shift-Return>', lambda x: x)
         self.root.bind('<Return>', self.close)
         self.root.bind("<FocusIn>", self.handle_focus)
 
@@ -38,22 +39,15 @@ class scrollTxtArea:
         frame=tk.Frame(root)
         frame.pack()
         self.textPad(frame)
-        return
 
     def textPad(self,frame):
         #add a frame and put a text area into it
         textPad=tk.Frame(frame)
         self.text=tk.Text(textPad,height=3,width=40)
         
-        # add a vertical scroll bar to the text area
-        scroll=tk.Scrollbar(textPad)
-        self.text.configure(yscrollcommand=scroll.set)
-        
         #pack everything
         self.text.pack(side=tk.LEFT)
-        scroll.pack(side=tk.RIGHT,fill=tk.Y)
         textPad.pack(side=tk.TOP)
-        return
 
     def getText(self):
         text = self.text.get("1.0", tk.END).strip() 
