@@ -1,12 +1,18 @@
+import json
 import tkinter as tk
 from os import system
 from platform import system as platform
 
-FILE="/Users/thomas/Dropbox/PhD/notes.md"
-
 class fileIO:
-    def __init__(self, fname):
-        self.fname = fname
+    def __init__(self, config_fname='config.json'):
+        self.config_fname = config_fname
+        with open(self.config_fname, 'r') as f:
+            self.config = json.loads(f.read())
+        self.fname = self.config["note_file"].strip()
+        self.prev_category = self.config["prev_category"].strip()
+
+    def get_prev_category(self):
+        return self.prev_category
 
     def update(self, category, text):
         category = "uncategorized" if category is None else category
@@ -34,11 +40,16 @@ class fileIO:
 
             f.close()
 
+        with open(self.config_fname, "w") as f:
+            self.config["prev_category"] = category
+            json.dumps(self.config)
+
 class noteGui:
-    def __init__(self, fname):
+    def __init__(self):
         self.root = tk.Tk()
-        self.fileIO = fileIO(fname)
-        self.scrollTxtArea = scrollTxtArea(self.root)
+        self.fileIO = fileIO()
+        prev_category = self.fileIO.get_prev_category()
+        self.scrollTxtArea = scrollTxtArea(self.root, prev_category)
         self.root.title('Note')
         self.root.bind('<Shift-Return>', lambda x: x)
         self.root.bind('<Return>', self.close)
@@ -67,15 +78,17 @@ class noteGui:
         self.root.mainloop()
 
 class scrollTxtArea:
-    def __init__(self,root):
+    def __init__(self, root, prev_category):
         frame=tk.Frame(root)
         frame.pack()
+        self.prev_category = prev_category
         self.textPad(frame)
 
     def textPad(self,frame):
         #add a frame and put a text area into it
         textPad=tk.Frame(frame)
         self.entry = tk.Entry(textPad)
+        self.entry.insert(0, self.prev_category)
         self.text=tk.Text(textPad, height=3, width=40)
         
         #pack everything
@@ -92,5 +105,5 @@ class scrollTxtArea:
         self.text.focus_set()
 
 if __name__ == '__main__':
-    ng = noteGui(FILE)
+    ng = noteGui()
     ng.run()
