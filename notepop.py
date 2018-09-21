@@ -42,7 +42,7 @@ class fileIO:
 
         with open(self.config_fname, "w") as f:
             self.config["prev_category"] = category
-            json.dumps(self.config)
+            json.dump(self.config, f)
 
 class noteGui:
     def __init__(self):
