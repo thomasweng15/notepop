@@ -2,12 +2,44 @@ import tkinter as tk
 from os import system
 from platform import system as platform
 
-class noteGui:
+FILE="/Users/thomas/Dropbox/PhD/notes.md"
+
+class fileIO:
     def __init__(self, fname):
         self.fname = fname
+
+    def update(self, category, text):
+        category = "uncategorized" if category is None else category
+        category_formatted = "# " + category + '\n'
+        text_formatted = "* " + text + '\n'
+
+        lines = None
+        index = None
+        with open(self.fname, "r") as f:
+            lines = f.readlines()
+            for idx, line in enumerate(lines):
+                if "# " + category + '\n' == line:
+                    index = idx
+            f.close()
+
+        with open(self.fname, "w") as f:
+            if index is not None and lines is not None:
+                lines.insert(index + 1, text_formatted)
+
+            f.writelines(lines)
+
+            if index is None:
+                f.write(category_formatted)
+                f.write(text_formatted)
+
+            f.close()
+
+class noteGui:
+    def __init__(self, fname):
         self.root = tk.Tk()
+        self.fileIO = fileIO(fname)
         self.scrollTxtArea = scrollTxtArea(self.root)
-        self.root.title('Append Note')
+        self.root.title('Note')
         self.root.bind('<Shift-Return>', lambda x: x)
         self.root.bind('<Return>', self.close)
         self.root.bind("<FocusIn>", self.handle_focus)
@@ -21,10 +53,10 @@ class noteGui:
             self.scrollTxtArea.setFocus()
 
     def close(self, evt=None):
-        text = self.scrollTxtArea.getText()
+        category, text = self.scrollTxtArea.getText()
         self.root.destroy()
-        with open(self.fname, "a") as f:
-            f.write(text)
+        if text != None:
+            self.fileIO.update(category, text)
     
     def run(self):
         self.root.lift()
@@ -43,20 +75,22 @@ class scrollTxtArea:
     def textPad(self,frame):
         #add a frame and put a text area into it
         textPad=tk.Frame(frame)
-        self.text=tk.Text(textPad,height=3,width=40)
+        self.entry = tk.Entry(textPad)
+        self.text=tk.Text(textPad, height=3, width=40)
         
         #pack everything
+        self.entry.pack(side=tk.TOP, fill='x')
         self.text.pack(side=tk.LEFT)
         textPad.pack(side=tk.TOP)
 
     def getText(self):
+        category = self.entry.get().strip()
         text = self.text.get("1.0", tk.END).strip() 
-        if text != "":
-            return '* ' + text + '\n'
+        return (category, text) if text != "" else (None, None)
 
     def setFocus(self):
         self.text.focus_set()
 
 if __name__ == '__main__':
-    ng = noteGui("/Users/thomas/Dropbox/PhD/notes.md")
+    ng = noteGui(FILE)
     ng.run()
