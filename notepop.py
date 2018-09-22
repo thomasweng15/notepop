@@ -3,8 +3,10 @@ import tkinter as tk
 from os import system
 from platform import system as platform
 
+CONFIG="/Users/thomas/c/notepop/config.json"
+
 class fileIO:
-    def __init__(self, config_fname='config.json'):
+    def __init__(self, config_fname=CONFIG):
         self.config_fname = config_fname
         with open(self.config_fname, 'r') as f:
             self.config = json.loads(f.read())
